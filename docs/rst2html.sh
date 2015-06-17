@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Creates HTML that includes webgl visualization
 #
 # Input: file.rst
@@ -7,23 +9,29 @@
 #	- notedown
 # 	- ipython
 
-# example: make_webgl_docs.sh file.rst file.html
+# example: rst2html.sh file.rst file.html
 
 INPUTFILE=$(basename $1)
-#EXT="${INPUTFILE##*.}"
+INPUTDIR=$(dirname $1)
 FILE="${INPUTFILE%.*}"
+OUTPUT=$2
+
+# if output file not provided
+if [ -z "$OUTPUT" ]; then
+	OUTPUT=$INPUTDIR/$FILE.html
+fi
 
 # convert RST to temp MD
-pandoc -i $1 -o tmp.md
+pandoc -i $1 -o $FILE.md
 
 # convert temp MD to IPYNB
-notedown tmp.md > $FILE.ipynb
+notedown $FILE.md > $FILE.ipynb
 
 # delete temp MD
-rm tmp.md
+rm $FILE.md
 
 # convert ipynb to html with custom template
-ipython nbconvert --to html --template ./tpl/mbuild_ipynb_template.tpl $FILE.ipynb --output $2
+ipython nbconvert --to html --template ./tpl/mbuild_ipynb_template.tpl $FILE.ipynb --output $OUTPUT
 
 # delete temp ipynb
 rm $FILE.ipynb
