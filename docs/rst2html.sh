@@ -21,6 +21,8 @@ if [ -z "$OUTPUT" ]; then
 	OUTPUT=$INPUTDIR/$FILE.html
 fi
 
+OUTPUTDIR=$(dirname $OUTPUT)
+
 # convert RST to temp MD
 pandoc -i $1 -o $FILE.md
 
@@ -32,6 +34,7 @@ rm $FILE.md
 
 # convert ipynb to html with custom template
 ipython nbconvert --to html --template ./tpl/mbuild_ipynb_template.tpl $FILE.ipynb --output $OUTPUT
+mv $FILE.ipynb $OUTPUTDIR/
 
-# delete temp ipynb
-rm $FILE.ipynb
+# don't delete temp ipynb
+#rm $FILE.ipynb
