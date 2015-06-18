@@ -3,38 +3,50 @@
 # Creates HTML that includes webgl visualization
 #
 # Input: file.rst
-# Output: file.html
+# Output: file.ipynb and file.html
 # Tools required:
 #	- pandoc
 #	- notedown
 # 	- ipython
 
-# example: rst2html.sh file.rst file.html
+# example: rst2html.sh file.rst file.ipynb file.html
 
 INPUTFILE=$(basename $1)
 INPUTDIR=$(dirname $1)
-FILE="${INPUTFILE%.*}"
-OUTPUT=$2
+FILENAME="${INPUTFILE%.*}"
 
-# if output file not provided
-if [ -z "$OUTPUT" ]; then
-	OUTPUT=$INPUTDIR/$FILE.html
+OUTPUT_IPYNB=$2
+OUTPUT_HTML=$3
+
+# if html output file not provided
+if [ -z "$OUTPUT_HTML" ]; then
+	OUTPUT_HTML=$INPUTDIR/$FILENAME.html
 fi
 
-OUTPUTDIR=$(dirname $OUTPUT)
+# if ipynb output not provided
+if [ -z "$OUTPUT_IPYNB" ]; then
+	OUTPUT_IPYNB=$INPUTDIR/$FILENAME.ipynb
+fi
+
+# check output dirs
+OUTPUTDIR_IPYNB=$(dirname $OUTPUT_IPYNB)
+OUTPUTDIR_HTML=$(dirname $OUTPUT_HTML)
+if [ ! -d "$OUTPUTDIR_IPYNB" ]; then
+	mkdir -p $OUTPUTDIR_IPYNB
+fi
+if [ ! -d "$OUTPUTDIR_HTML" ]; then
+	mkdir -p $OUTPUTDIR_HTML
+fi
 
 # convert RST to temp MD
-pandoc -i $1 -o $FILE.md
+pandoc -i $1 -o $FILENAME.md
 
+echo "Converting $INPUTFILE to $OUTPUT_IPYNB"
 # convert temp MD to IPYNB
-notedown $FILE.md > $FILE.ipynb
+notedown $FILENAME.md > $OUTPUT_IPYNB
 
 # delete temp MD
-rm $FILE.md
+rm $FILENAME.md
 
 # convert ipynb to html with custom template
-ipython nbconvert --to html --template ./tpl/mbuild_ipynb_template.tpl $FILE.ipynb --output $OUTPUT
-mv $FILE.ipynb $OUTPUTDIR/
-
-# don't delete temp ipynb
-#rm $FILE.ipynb
+ipython nbconvert --to html --template ./tpl/mbuild_ipynb_template.tpl $OUTPUT_IPYNB --output $OUTPUT_HTML
