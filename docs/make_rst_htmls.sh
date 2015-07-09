@@ -30,7 +30,7 @@ done
 echo "Copying assets/ to html directory"
 
 # copy assets/ dir to HTMLDIR/ -- but don't delete if they're the same
-if [ -d "$HTMLDIR/assets" ]; then
+if [ ! -d "$HTMLDIR/assets" ]; then
 	ASSETS_ABSPATH_REAL=`cd "./assets/"; pwd`
 	ASSETS_ABSPATH_TARGET=`cd "$HTMLDIR/assets"; pwd`
 
@@ -42,3 +42,5 @@ if [ -d "$HTMLDIR/assets" ]; then
 		cp -r assets/ $HTMLDIR/assets/
 	fi
 fi
+
+cp tutorials/*.pdb $IPYNBDIR
