@@ -155,6 +155,8 @@ class Grid3DPattern(Pattern):
             points[i*m*l + j*l + k, 2] = k / l
         super(Grid3DPattern, self).__init__(points=points, orientations=orientations)
 
+class Hexagonal2DPattern(Pattern):
+
 
 class SpherePattern(Pattern):
     """Generate N evenly distributed points on the unit sphere.
