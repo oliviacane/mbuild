@@ -5,6 +5,7 @@ import operator
 from itertools import product
 
 import numpy as np
+import math
 
 from mbuild.coordinate_transform import (equivalence_transform, translate,
                                          rotate_around_x, rotate_around_y,
@@ -13,7 +14,7 @@ from mbuild.utils.validation import assert_port_exists
 from mbuild import clone
 
 __all__ = ['Pattern', 'DiskPattern', 'SpherePattern', 'Random2DPattern',
-           'Random3DPattern', 'Grid2DPattern', 'Grid3DPattern','Random2DPatternNoOverlap']
+           'Random3DPattern', 'Grid2DPattern', 'Grid3DPattern','Random2DPatternNoOverlap', 'HexagonalPattern']
 
 
 class Pattern(object):
@@ -142,9 +143,26 @@ class Grid2DPattern(Pattern):
     def __init__(self, n, m, orientations=None):
         points = np.zeros(shape=(n*m, 3), dtype=float)
         for i, j in product(range(n), range(m)):
-            points[i*m + j, 0] = i / n
-            points[i*m + j, 1] = j / m
+            points[i*m + j, 0] = i/n
+            print(i/n)
+            points[i*m + j, 1] = j/m
         super(Grid2DPattern, self).__init__(points=points, orientations=orientations)
+
+class HexagonalPattern(Pattern):
+    def __init__(self,n, orientations=None):
+        base=2.5
+        height=1.8
+        y = n+1
+        points = np.zeros(shape=(n*y, 3), dtype=float)
+        for i,j in product(range(y), range(n)):
+            k=0
+            if(i%2):
+                k=1
+            points[i*n + j, 0] = (k*(base/2)+ base*j)
+            print(k)
+            points[i*n + j, 1] = height*i
+        super(HexagonalPattern, self).__init__(points=points, orientations=orientations)
+
 
 
 class Grid3DPattern(Pattern):
