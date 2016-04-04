@@ -1,3 +1,4 @@
+
 from __future__ import division
 import operator
 
@@ -12,7 +13,7 @@ from mbuild.utils.validation import assert_port_exists
 from mbuild import clone
 
 __all__ = ['Pattern', 'DiskPattern', 'SpherePattern', 'Random2DPattern',
-           'Random3DPattern', 'Grid2DPattern', 'Grid3DPattern']
+           'Random3DPattern', 'Grid2DPattern', 'Grid3DPattern','Random2DPatternNoOverlap']
 
 
 class Pattern(object):
@@ -154,6 +155,31 @@ class Grid3DPattern(Pattern):
             points[i*m*l + j*l + k, 1] = j / m
             points[i*m*l + j*l + k, 2] = k / l
         super(Grid3DPattern, self).__init__(points=points, orientations=orientations)
+
+class Random2DPatternNoOverlap(Pattern):
+    def __init__(self, n, orientations=None):
+        points = np.zeros(shape=(n, 3), dtype=float)
+        points[:,2]=0
+        for i in range(n):
+            overlap = 'true'
+            times = 0
+            while(overlap == 'true' and times < 100):
+                points[i,0] =np.random.random()
+                points[i,1] =np.random.random()
+                found = 0
+                l=0
+                while(found==0 and l<i):
+                    distance = ((points[l,0] - points[i,0])**2 + (points[l,1] - points[i,1])**2)**0.5
+                    if(distance < 0.09):
+                        found = 1
+                    l += 1
+                if(found==0):
+                    overlap='false'
+                times += 1
+            if (times == 100):
+                print("Use less particles")
+                break
+        super(Random2DPatternNoOverlap, self).__init__(points=points, orientations=orientations)
 
 
 class SpherePattern(Pattern):
